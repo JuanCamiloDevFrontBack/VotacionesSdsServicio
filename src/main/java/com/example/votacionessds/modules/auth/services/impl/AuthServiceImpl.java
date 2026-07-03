@@ -5,16 +5,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+
+import com.example.votacionessds.exceptions.ConflictException;
+import com.example.votacionessds.exceptions.ErrorCode;
+import com.example.votacionessds.exceptions.InvalidCredentialsException;
+import com.example.votacionessds.exceptions.ResourceNotFoundException;
 
 import com.example.votacionessds.modules.auth.dao.RoleRepository;
 import com.example.votacionessds.modules.auth.dao.UserRepository;
@@ -53,10 +55,10 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public LoginResponse login(LoginRequest request, String ipSolicitante, String appSolicitante) {
         User user = userRepository.findByUsername(request.getUsername())
-        .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+        .orElseThrow(() -> new InvalidCredentialsException(ErrorCode.INVALID_CREDENTIALS, "Invalid credentials"));
         
         if (!user.isAccountNonLocked()) {
-            throw new BadCredentialsException("Account is locked");
+            throw new InvalidCredentialsException(ErrorCode.ACCOUNT_LOCKED, "Account is locked");
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -88,9 +90,9 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request, String ip, String userAgent) {
         RefreshToken existing = refreshTokenService.findByToken(request.getRefreshToken())
-        .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+        .orElseThrow(() -> new InvalidCredentialsException(ErrorCode.INVALID_REFRESH_TOKEN, "Invalid refresh token"));
         if (existing.isRevoked() || existing.getExpiresAt().isBefore(Instant.now())) {
-            throw new BadCredentialsException("Refresh token revoked or expired");
+            throw new InvalidCredentialsException(ErrorCode.REFRESH_TOKEN_EXPIRED, "Refresh token revoked or expired");
         }
         RefreshToken rotated = refreshTokenService.rotateRefreshToken(existing);
         String accessToken = jwtProvider.generateAccessToken(
@@ -113,9 +115,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void changePassword(UUID userId, ChangePasswordRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Current password does not match");
+            throw new InvalidCredentialsException(ErrorCode.INVALID_CREDENTIALS, "Current password does not match");
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setPasswordChangedAt(Instant.now());
@@ -139,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserResponse me(String username) {
         User u = userRepository.findByUsername(username)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         return UserResponse.builder()
                 .id(u.getId())
                 .username(u.getUsername())
@@ -153,17 +156,17 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new ConflictException(ErrorCode.USERNAME_EXISTS, "Username already exists");
         }
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            throw new ConflictException(ErrorCode.EMAIL_EXISTS, "Email already exists");
         }
 
         String roleCode = request.getRoleCode() != null && !request.getRoleCode().isBlank()
                 ? request.getRoleCode()
                 : "VOTANTE";
         Role role = roleRepository.findByCode(roleCode)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found: " + roleCode));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ROLE_NOT_FOUND, "Role not found: " + roleCode));
 
         User user = User.builder()
                 .username(request.getUsername())

@@ -1,0 +1,17 @@
+package com.example.votacionessds.exceptions;
+
+public enum ErrorCode {
+    VALIDATION_ERROR,
+    MALFORMED_REQUEST,
+    INVALID_CREDENTIALS,
+    ACCOUNT_LOCKED,
+    INVALID_REFRESH_TOKEN,
+    REFRESH_TOKEN_EXPIRED,
+    UNAUTHORIZED,
+    ACCESS_DENIED,
+    USER_NOT_FOUND,
+    ROLE_NOT_FOUND,
+    USERNAME_EXISTS,
+    EMAIL_EXISTS,
+    INTERNAL_ERROR
+}
