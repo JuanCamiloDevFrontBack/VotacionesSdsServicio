@@ -1,14 +1,28 @@
 package com.example.votacionessds.modules.auth.restcontroller;
 
-import com.example.votacionessds.modules.auth.dto.*;
-import com.example.votacionessds.modules.auth.services.AuthService;
-import lombok.RequiredArgsConstructor;
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.votacionessds.modules.auth.dto.ChangePasswordRequest;
+import com.example.votacionessds.modules.auth.dto.ForgotPasswordRequest;
+import com.example.votacionessds.modules.auth.dto.LoginRequest;
+import com.example.votacionessds.modules.auth.dto.LoginResponse;
+import com.example.votacionessds.modules.auth.dto.RefreshTokenRequest;
+import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
+import com.example.votacionessds.modules.auth.dto.ResetPasswordRequest;
+import com.example.votacionessds.modules.auth.dto.UserResponse;
+import com.example.votacionessds.modules.auth.services.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Validated @RequestBody final LoginRequest request, HttpServletRequest httpRequest) {
-        System.out.println("Login request: " + request);
+        //System.out.println("Login request: " + request);
         String ipSolicitante = httpRequest.getRemoteAddr();
         String appSolicitante = httpRequest.getHeader("User-Agent");
         return ResponseEntity.ok(authService.login(request, ipSolicitante, appSolicitante));
