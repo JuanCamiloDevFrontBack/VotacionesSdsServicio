@@ -10,7 +10,7 @@ public class VotacionessdsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VotacionessdsApplication.class, args);
-		System.out.println("Hello World :)");
+		System.out.println("Start Application, Hello World :)");
 	}
 
 }
