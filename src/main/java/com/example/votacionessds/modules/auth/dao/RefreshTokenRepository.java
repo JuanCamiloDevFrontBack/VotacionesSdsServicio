@@ -5,10 +5,17 @@ import com.example.votacionessds.modules.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
-    Optional<RefreshToken> findByToken(String token);
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
+    Optional<RefreshToken> findByTokenHash(String tokenHash);
+
+    List<RefreshToken> findByFamilyId(UUID familyId);
+
+    List<RefreshToken> findByUserAndRevokedFalse(User user);
+
     void deleteByUser(User user);
 }

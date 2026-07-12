@@ -14,4 +14,8 @@ public interface AuthService {
     UserResponse me(String username);
 
     UserResponse createUser(CreateUserRequest request);
+
+    UserResponse updateUserTest(String accessToken, UpdateUserTestRequest request);
+
+    UserResponse updateUsernameByRefreshTokenTest(UpdateUsernameByRefreshTokenTestRequest request);
 }

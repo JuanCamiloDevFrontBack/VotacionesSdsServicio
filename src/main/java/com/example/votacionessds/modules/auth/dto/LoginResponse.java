@@ -1,5 +1,7 @@
 package com.example.votacionessds.modules.auth.dto;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,4 +15,5 @@ public class LoginResponse {
     private String accessToken;
     private String refreshToken;
     private String tokenType;
+    private UUID sessionId;
 }

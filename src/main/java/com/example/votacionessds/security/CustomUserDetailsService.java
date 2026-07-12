@@ -22,18 +22,23 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("--email: --" + email);
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        Set<GrantedAuthority> authorities = user.getRoles() == null ? Set.of(new SimpleGrantedAuthority("VOTANTE")) :
-                user.getRoles().stream().map(r -> new SimpleGrantedAuthority(r.getCode())).collect(Collectors.toSet());
-
+        Set<GrantedAuthority> authorities = (user.getRoles() == null || user.getRoles().isEmpty())
+                ? Set.of(new SimpleGrantedAuthority("ROLE_VOTE"))
+                : user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                        .collect(Collectors.toSet());
+        System.out.println("--authorities: --" + authorities);
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
+                .username(user.getEmail())
+                .password(user.getPasswordHash())
                 .authorities(authorities)
-                .accountLocked(!user.isAccountNonLocked())
+                .disabled(!user.isEnabled())
+                .accountLocked(!user.isLoginAllowed())
                 .build();
     }
 }
