@@ -21,16 +21,19 @@ public class AuthenticatedUserProvider {
     private final UserRepository userRepository;
 
     public User getCurrentUser() {
+        System.out.println("AuthenticatedUserProvider: getCurrentUser");
         String email = getCurrentUserEmail();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
     }
 
     public UUID getCurrentUserId() {
+        System.out.println("AuthenticatedUserProvider: getCurrentUserId");
         return getCurrentUser().getId();
     }
 
     public String getCurrentUserEmail() {
+        System.out.println("AuthenticatedUserProvider: getCurrentUserEmail");
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails userDetails)) {
             throw new InvalidCredentialsException(ErrorCode.UNAUTHORIZED, "User is not authenticated");

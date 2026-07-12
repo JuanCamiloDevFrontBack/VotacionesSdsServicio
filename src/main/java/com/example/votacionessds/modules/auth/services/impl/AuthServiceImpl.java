@@ -115,6 +115,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request, String ip, String userAgent) {
+        System.out.println("AuthServiceImpl: refreshToken");
         RefreshToken existing = refreshTokenService.resolve(request.getRefreshToken())
                 .orElseThrow(() -> new InvalidCredentialsException(
                         ErrorCode.INVALID_REFRESH_TOKEN,
@@ -176,6 +177,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional(readOnly = true)
     public UserResponse me(String username) {
+        System.out.println("AuthServiceImpl: me");
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         return toUserResponse(user);

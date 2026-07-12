@@ -38,6 +38,7 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
+        System.out.println("JwtProvider: generateAccessToken");
         return generateAccessToken(userDetails, null);
     }
 
@@ -55,12 +56,14 @@ public class JwtProvider {
     }
 
     public String getUsernameFromToken(String token) {
+        System.out.println("JwtProvider: getUsernameFromToken");
         Claims claims = Jwts.parser()
                 .verifyWith(key).build().parseSignedClaims(token).getPayload();
         return claims.getSubject();
     }
 
     public Optional<UUID> getSessionIdFromToken(String token) {
+        System.out.println("JwtProvider: getSessionIdFromToken");
         Claims claims = Jwts.parser()
                 .verifyWith(key).build().parseSignedClaims(token).getPayload();
         Object sid = claims.get(SESSION_CLAIM);
@@ -71,6 +74,7 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String token) {
+        System.out.println("JwtProvider: validateToken");
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;

@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+        System.out.println("JwtAuthenticationFilter: doFilter");
         var typeHeader = "Authorization";
         var prefixHeader = "Bearer ";
         HttpServletRequest request = (HttpServletRequest) servletRequest;

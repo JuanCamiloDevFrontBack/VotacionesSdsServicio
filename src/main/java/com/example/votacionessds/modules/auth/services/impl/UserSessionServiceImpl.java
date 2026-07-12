@@ -33,6 +33,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional
     public UserSession createSession(User user, UUID familyId, String ip, String userAgent, Instant expiresAt) {
+        System.out.println("UserSessionServiceImpl: createSession");
         Instant now = Instant.now();
         UserSession session = UserSession.builder()
                 .user(user)
@@ -50,6 +51,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional
     public void touchByFamilyId(UUID familyId) {
+        System.out.println("UserSessionServiceImpl: touchByFamilyId");
         UserSession session = userSessionRepository.findByFamilyIdAndRevokedFalse(familyId)
                 .orElseThrow(() -> new InvalidCredentialsException(
                         ErrorCode.SESSION_REVOKED,
@@ -67,6 +69,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional(readOnly = true)
     public boolean isActive(UUID sessionId) {
+        System.out.println("UserSessionServiceImpl: isActive");
         return userSessionRepository.findById(sessionId)
                 .map(this::isSessionActive)
                 .orElse(false);
@@ -75,6 +78,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserSession> findActiveByFamilyId(UUID familyId) {
+        System.out.println("UserSessionServiceImpl: findActiveByFamilyId");
         return userSessionRepository.findByFamilyIdAndRevokedFalse(familyId)
                 .filter(this::isSessionActive);
     }
@@ -82,6 +86,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional
     public void revokeSession(UUID sessionId, UUID userId) {
+        System.out.println("UserSessionServiceImpl: revokeSession");
         UserSession session = userSessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         ErrorCode.SESSION_NOT_FOUND,
@@ -96,6 +101,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional
     public void revokeAllActiveForUser(UUID userId) {
+        System.out.println("UserSessionServiceImpl: revokeAllActiveForUser");
         List<UserSession> sessions = userSessionRepository.findByUserIdAndRevokedFalse(userId);
         Instant now = Instant.now();
         for (UserSession session : sessions) {
@@ -111,6 +117,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional
     public void revokeByFamilyId(UUID familyId) {
+        System.out.println("UserSessionServiceImpl: revokeByFamilyId");
         userSessionRepository.findByFamilyId(familyId).ifPresent(session -> {
             if (!session.isRevoked()) {
                 revokeSessionInternal(session);
@@ -122,6 +129,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     @Transactional(readOnly = true)
     public List<SessionResponse> listActiveForUser(UUID userId, UUID currentSessionId) {
+        System.out.println("UserSessionServiceImpl: listActiveForUser");
         return userSessionRepository.findByUserIdAndRevokedFalse(userId).stream()
                 .filter(this::isSessionActive)
                 .map(session -> toSessionResponse(session, currentSessionId))
@@ -131,6 +139,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void revokeExpiredSessions() {
+        System.out.println("UserSessionServiceImpl: revokeExpiredSessions");
         List<UserSession> expired = userSessionRepository.findByRevokedFalseAndExpiresAtBefore(Instant.now());
         for (UserSession session : expired) {
             revokeSessionInternal(session);
@@ -141,16 +150,19 @@ public class UserSessionServiceImpl implements UserSessionService {
     }
 
     private boolean isSessionActive(UserSession session) {
+        System.out.println("UserSessionServiceImpl: isSessionActive");
         return !session.isRevoked() && !session.getExpiresAt().isBefore(Instant.now());
     }
 
     private void revokeSessionInternal(UserSession session) {
+        System.out.println("UserSessionServiceImpl: revokeSessionInternal");
         session.setRevoked(true);
         session.setRevokedAt(Instant.now());
         userSessionRepository.save(session);
     }
 
     private SessionResponse toSessionResponse(UserSession session, UUID currentSessionId) {
+        System.out.println("UserSessionServiceImpl: toSessionResponse");
         return SessionResponse.builder()
                 .id(session.getId())
                 .ipAddress(session.getIpAddress())

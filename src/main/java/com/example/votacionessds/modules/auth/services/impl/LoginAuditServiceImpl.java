@@ -19,7 +19,7 @@ public class LoginAuditServiceImpl implements LoginAuditService {
     @Override
     @Transactional
     public void recordSuccess(User user, String ip, String userAgent) {
-        System.out.println("--recordSuccess: --" + user);
+        System.out.println("LoginAuditServiceImpl: recordSuccess");
         loginAuditRepository.save(LoginAudit.builder()
                 .user(user)
                 .emailAttempted(user.getEmail())
@@ -32,6 +32,7 @@ public class LoginAuditServiceImpl implements LoginAuditService {
     @Override
     @Transactional
     public void recordFailure(String emailAttempted, String ip, String userAgent) {
+        System.out.println("LoginAuditServiceImpl: recordFailure");
         loginAuditRepository.save(LoginAudit.builder()
                 .emailAttempted(emailAttempted)
                 .success(false)

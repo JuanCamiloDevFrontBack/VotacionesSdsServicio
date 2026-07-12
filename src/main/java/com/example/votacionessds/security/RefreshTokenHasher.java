@@ -12,10 +12,12 @@ public final class RefreshTokenHasher {
     }
 
     public static String generateRawToken() {
+        System.out.println("RefreshTokenHasher: generateRawToken");
         return UUID.randomUUID().toString();
     }
 
     public static String hash(String rawToken) {
+        System.out.println("RefreshTokenHasher: hash");
         System.out.println("rawToken: " + rawToken);
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

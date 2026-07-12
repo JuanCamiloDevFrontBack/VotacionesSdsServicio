@@ -31,18 +31,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public IssuedRefreshToken issue(User user, String ip, String userAgent) {
+        System.out.println("RefreshTokenServiceImpl: issue");
         return persistToken(user, UUID.randomUUID(), ip, userAgent);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<RefreshToken> resolve(String rawToken) {
+        System.out.println("RefreshTokenServiceImpl: resolve");
         return refreshTokenRepository.findByTokenHash(RefreshTokenHasher.hash(rawToken));
     }
 
     @Override
     @Transactional
     public IssuedRefreshToken rotate(RefreshToken existing, String ip, String userAgent) {
+        System.out.println("RefreshTokenServiceImpl: rotate");
         if (existing.isRevoked()) {
             revokeFamily(existing.getFamilyId());
             throw new InvalidCredentialsException(
@@ -72,6 +75,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public void revoke(RefreshToken token) {
+        System.out.println("RefreshTokenServiceImpl: revoke");
         token.setRevoked(true);
         token.setRevokedAt(Instant.now());
         refreshTokenRepository.save(token);
@@ -80,6 +84,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public void revokeFamily(UUID familyId) {
+        System.out.println("RefreshTokenServiceImpl: revokeFamily");
         List<RefreshToken> familyTokens = refreshTokenRepository.findByFamilyId(familyId);
         Instant now = Instant.now();
         for (RefreshToken token : familyTokens) {
@@ -94,6 +99,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public void revokeAllForUser(User user) {
+        System.out.println("RefreshTokenServiceImpl: revokeAllForUser");
         List<RefreshToken> tokens = refreshTokenRepository.findByUserAndRevokedFalse(user);
         Instant now = Instant.now();
         for (RefreshToken token : tokens) {
@@ -106,9 +112,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private IssuedRefreshToken persistToken(User user, UUID familyId, String ip, String userAgent) {
-        System.out.println("--persistToken: --" + user);
         String rawToken = RefreshTokenHasher.generateRawToken();
-        System.out.println("--rawToken: --" + rawToken);
         RefreshToken entity = RefreshToken.builder()
                 .user(user)
                 .tokenHash(RefreshTokenHasher.hash(rawToken))
