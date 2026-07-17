@@ -1,10 +1,10 @@
 package com.example.votacionessds.modules.auth.restcontroller;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;     
 import org.springframework.validation.annotation.Validated;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,7 +28,9 @@ import com.example.votacionessds.modules.auth.services.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -44,8 +46,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(@Validated @RequestBody final RefreshTokenRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@Validated @RequestBody final RefreshTokenRequest request, @RequestHeader(value = "Refresh-Token", required = false) final String refresToken, HttpServletRequest httpRequest) {
         System.out.println("endpoint request refreshtoken: " + request);
+        log.info("endpoint request refreshtoken: {}", refresToken);
         String ip = httpRequest.getRemoteAddr();
         String ua = httpRequest.getHeader("User-Agent");
         return ResponseEntity.ok(authService.refreshToken(request, ip, ua));
@@ -85,11 +88,7 @@ public class AuthController {
             @RequestHeader(value = "Authorization", required = false) final String authorization,
             @Validated @RequestBody final UpdateUserTestRequest request) {
         // de prueba — se quitará después
-        String token = null;
-        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
-            token = authorization.substring(7);
-        }
-        return ResponseEntity.ok(authService.updateUserTest(token, request));
+        return ResponseEntity.ok(authService.updateUserTest(authorization, request));
     }
 
     @PutMapping("/test-update-username")
@@ -97,5 +96,12 @@ public class AuthController {
             @Validated @RequestBody final UpdateUsernameByRefreshTokenTestRequest request) {
         // de prueba — se quitará después
         return ResponseEntity.ok(authService.updateUsernameByRefreshTokenTest(request));
+    }
+
+    @GetMapping("/test-users")
+    public ResponseEntity<List<UserResponse>> getAllUsersTest(
+            @RequestHeader(value = "Authorization", required = true) final String authorization) {
+        // de prueba — se quitará después
+        return ResponseEntity.ok(authService.getAllUsersTest(authorization));
     }
 }

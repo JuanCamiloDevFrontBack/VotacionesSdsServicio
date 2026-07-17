@@ -123,7 +123,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .userAgent(userAgent)
                 .ipAddress(ip)
                 .build();
-        System.out.println("--entity: --" + entity);
         return new IssuedRefreshToken(rawToken, refreshTokenRepository.save(entity));
     }
 }

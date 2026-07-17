@@ -1,6 +1,7 @@
 package com.example.votacionessds.modules.auth.services.impl;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.example.votacionessds.exceptions.ConflictException;
 import com.example.votacionessds.exceptions.ErrorCode;
@@ -43,7 +45,9 @@ import com.example.votacionessds.modules.auth.services.UserSessionService;
 import com.example.votacionessds.security.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -62,11 +66,15 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest request, String ipSolicitante, String appSolicitante) {
         User user = userRepository.findByEmail(request.getEmail()).orElse(null);
         if (user == null) {
+            log.error("User not found for email: {}", request.getEmail());
+            // Tenerlo presente para eliminar en el futuro
             loginAuditService.recordFailure(request.getEmail(), ipSolicitante, appSolicitante);
             throw new InvalidCredentialsException(ErrorCode.INVALID_CREDENTIALS, "Invalid credentials");
         }
 
         if (!user.isLoginAllowed()) {
+            log.warn("User is not allowed to login: {}", user.getEmail());
+            // Tenerlo presente para eliminar en el futuro
             loginAuditService.recordFailure(user.getEmail(), ipSolicitante, appSolicitante);
             throw new InvalidCredentialsException(ErrorCode.ACCOUNT_LOCKED, "Account is locked");
         }
@@ -76,7 +84,6 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
                             request.getPassword()));
-            System.out.println("--try cach {authentication: --}" + authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             user.setFailedLoginAttempts((short) 0);
@@ -107,6 +114,7 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException ex) {
             user.setFailedLoginAttempts((short) (user.getFailedLoginAttempts() + 1));
             userRepository.save(user);
+            // Tenerlo presente para eliminar en el futuro
             loginAuditService.recordFailure(user.getEmail(), ipSolicitante, appSolicitante);
             throw new InvalidCredentialsException(ErrorCode.INVALID_CREDENTIALS, "Invalid credentials");
         }
@@ -220,8 +228,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserResponse updateUserTest(String accessToken, UpdateUserTestRequest request) {
+    public UserResponse updateUserTest(String authorization, UpdateUserTestRequest request) {
         // de prueba — se quitará después
+        String accessToken = null;
+        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
+            accessToken = authorization.substring(7);
+        }
+
         if (accessToken == null || accessToken.isBlank() || !jwtProvider.validateToken(accessToken)) {
             throw new InvalidCredentialsException(ErrorCode.UNAUTHORIZED, "Invalid or missing access token");
         }
@@ -281,6 +294,24 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(request.getUsername());
         User saved = userRepository.save(user);
         return toUserResponse(saved);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsersTest(String authorization) {
+        // de prueba — se quitará después
+        String accessToken = null;
+        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
+            accessToken = authorization.substring(7);
+        }
+
+        if (accessToken == null || accessToken.isBlank() || !jwtProvider.validateToken(accessToken)) {
+            throw new InvalidCredentialsException(ErrorCode.UNAUTHORIZED, "Invalid or missing access token");
+        }
+
+        return userRepository.findAll().stream()
+                .map(this::toUserResponse)
+                .toList();
     }
 
     private org.springframework.security.core.userdetails.User toSpringUser(User user) {

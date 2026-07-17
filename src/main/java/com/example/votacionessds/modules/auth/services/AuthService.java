@@ -2,6 +2,7 @@ package com.example.votacionessds.modules.auth.services;
 
 import com.example.votacionessds.modules.auth.dto.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AuthService {
@@ -18,4 +19,6 @@ public interface AuthService {
     UserResponse updateUserTest(String accessToken, UpdateUserTestRequest request);
 
     UserResponse updateUsernameByRefreshTokenTest(UpdateUsernameByRefreshTokenTestRequest request);
+
+    List<UserResponse> getAllUsersTest(String authorization);
 }

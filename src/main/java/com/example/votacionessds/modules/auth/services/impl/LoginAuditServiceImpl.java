@@ -32,7 +32,7 @@ public class LoginAuditServiceImpl implements LoginAuditService {
     @Override
     @Transactional
     public void recordFailure(String emailAttempted, String ip, String userAgent) {
-        System.out.println("LoginAuditServiceImpl: recordFailure");
+        System.out.println("LoginAuditServiceImpl: recordFailure" + emailAttempted);
         loginAuditRepository.save(LoginAudit.builder()
                 .emailAttempted(emailAttempted)
                 .success(false)

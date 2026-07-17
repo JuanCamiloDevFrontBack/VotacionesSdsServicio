@@ -17,6 +17,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import com.example.votacionessds.exceptions.ErrorCode;
+import com.example.votacionessds.exceptions.ResourceNotFoundException;
 
 @Component
 @RequiredArgsConstructor
@@ -57,9 +59,13 @@ public class JwtProvider {
 
     public String getUsernameFromToken(String token) {
         System.out.println("JwtProvider: getUsernameFromToken");
-        Claims claims = Jwts.parser()
+        try {
+            Claims claims = Jwts.parser()
                 .verifyWith(key).build().parseSignedClaims(token).getPayload();
-        return claims.getSubject();
+            return claims.getSubject();
+        } catch (ResourceNotFoundException ex) {
+            throw new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found");
+        }
     }
 
     public Optional<UUID> getSessionIdFromToken(String token) {
