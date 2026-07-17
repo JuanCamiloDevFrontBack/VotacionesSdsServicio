@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface AuthService {
     LoginResponse login(LoginRequest request, String ip, String userAgent);
-    RefreshTokenResponse refreshToken(RefreshTokenRequest request, String ip, String userAgent);
+    RefreshTokenResponse refreshToken(String refreshToken, String ip, String userAgent);
     void logout(String refreshToken);
     void changePassword(UUID userId, ChangePasswordRequest request);
     void forgotPassword(ForgotPasswordRequest request);

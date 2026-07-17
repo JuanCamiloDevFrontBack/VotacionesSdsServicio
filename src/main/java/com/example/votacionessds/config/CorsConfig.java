@@ -41,7 +41,7 @@ public class CorsConfig {
                 "Origin"
         ));
 
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source =

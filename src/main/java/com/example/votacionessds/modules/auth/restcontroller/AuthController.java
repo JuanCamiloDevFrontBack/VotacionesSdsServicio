@@ -3,7 +3,9 @@ package com.example.votacionessds.modules.auth.restcontroller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;     
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,46 +20,60 @@ import com.example.votacionessds.modules.auth.dto.ChangePasswordRequest;
 import com.example.votacionessds.modules.auth.dto.ForgotPasswordRequest;
 import com.example.votacionessds.modules.auth.dto.LoginRequest;
 import com.example.votacionessds.modules.auth.dto.LoginResponse;
-import com.example.votacionessds.modules.auth.dto.RefreshTokenRequest;
 import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 import com.example.votacionessds.modules.auth.dto.ResetPasswordRequest;
 import com.example.votacionessds.modules.auth.dto.UpdateUserTestRequest;
 import com.example.votacionessds.modules.auth.dto.UpdateUsernameByRefreshTokenTestRequest;
 import com.example.votacionessds.modules.auth.dto.UserResponse;
 import com.example.votacionessds.modules.auth.services.AuthService;
+import com.example.votacionessds.modules.auth.services.RefreshTokenCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenCookieService refreshTokenCookieService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Validated @RequestBody final LoginRequest request, HttpServletRequest httpRequest) {
         String ipSolicitante = httpRequest.getRemoteAddr();
         String appSolicitante = httpRequest.getHeader("User-Agent");
-        return ResponseEntity.ok(authService.login(request, ipSolicitante, appSolicitante));
+        LoginResponse response = authService.login(request, ipSolicitante, appSolicitante);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE,
+                        refreshTokenCookieService.createCookie(response.getRefreshToken()).toString())
+                .body(response);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(@Validated @RequestBody final RefreshTokenRequest request, @RequestHeader(value = "Refresh-Token", required = false) final String refresToken, HttpServletRequest httpRequest) {
-        System.out.println("endpoint request refreshtoken: " + request);
-        log.info("endpoint request refreshtoken: {}", refresToken);
+    public ResponseEntity<RefreshTokenResponse> refreshToken(
+            @RequestHeader("X-Requested-With") final String requestedWith,
+            HttpServletRequest httpRequest) {
+        validateCsrfHeader(requestedWith);
+        String refreshToken = refreshTokenCookieService.getRefreshToken(httpRequest);
         String ip = httpRequest.getRemoteAddr();
         String ua = httpRequest.getHeader("User-Agent");
-        return ResponseEntity.ok(authService.refreshToken(request, ip, ua));
+        RefreshTokenResponse response = authService.refreshToken(refreshToken, ip, ua);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE,
+                        refreshTokenCookieService.createCookie(response.getRefreshToken()).toString())
+                .body(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Validated @RequestBody final RefreshTokenRequest request) {
-        authService.logout(request.getRefreshToken());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> logout(
+            @RequestHeader("X-Requested-With") final String requestedWith,
+            HttpServletRequest httpRequest) {
+        validateCsrfHeader(requestedWith);
+        authService.logout(refreshTokenCookieService.getRefreshToken(httpRequest));
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieService.clearCookie().toString())
+                .build();
     }
 
     @PostMapping("/change-password")
@@ -103,5 +119,11 @@ public class AuthController {
             @RequestHeader(value = "Authorization", required = true) final String authorization) {
         // de prueba — se quitará después
         return ResponseEntity.ok(authService.getAllUsersTest(authorization));
+    }
+
+    private void validateCsrfHeader(String requestedWith) {
+        if (!"XMLHttpRequest".equals(requestedWith)) {
+            throw new AccessDeniedException("Invalid CSRF protection header");
+        }
     }
 }

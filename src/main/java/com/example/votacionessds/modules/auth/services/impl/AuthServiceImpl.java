@@ -27,7 +27,6 @@ import com.example.votacionessds.modules.auth.dto.CreateUserRequest;
 import com.example.votacionessds.modules.auth.dto.ForgotPasswordRequest;
 import com.example.votacionessds.modules.auth.dto.LoginRequest;
 import com.example.votacionessds.modules.auth.dto.LoginResponse;
-import com.example.votacionessds.modules.auth.dto.RefreshTokenRequest;
 import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 import com.example.votacionessds.modules.auth.dto.ResetPasswordRequest;
 import com.example.votacionessds.modules.auth.dto.UpdateUserTestRequest;
@@ -122,9 +121,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public RefreshTokenResponse refreshToken(RefreshTokenRequest request, String ip, String userAgent) {
+    public RefreshTokenResponse refreshToken(String refreshToken, String ip, String userAgent) {
         System.out.println("AuthServiceImpl: refreshToken");
-        RefreshToken existing = refreshTokenService.resolve(request.getRefreshToken())
+        RefreshToken existing = refreshTokenService.resolve(refreshToken)
                 .orElseThrow(() -> new InvalidCredentialsException(
                         ErrorCode.INVALID_REFRESH_TOKEN,
                         "Invalid refresh token"));
