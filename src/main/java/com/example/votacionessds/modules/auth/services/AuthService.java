@@ -1,24 +1,11 @@
 package com.example.votacionessds.modules.auth.services;
 
-import com.example.votacionessds.modules.auth.dto.*;
-
-import java.util.List;
-import java.util.UUID;
+import com.example.votacionessds.modules.auth.dto.LoginRequest;
+import com.example.votacionessds.modules.auth.dto.LoginResponse;
+import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 
 public interface AuthService {
     LoginResponse login(LoginRequest request, String ip, String userAgent);
     RefreshTokenResponse refreshToken(String refreshToken, String ip, String userAgent);
     void logout(String refreshToken);
-    void changePassword(UUID userId, ChangePasswordRequest request);
-    void forgotPassword(ForgotPasswordRequest request);
-    void resetPassword(ResetPasswordRequest request);
-    UserResponse me(String username);
-
-    UserResponse createUser(CreateUserRequest request);
-
-    UserResponse updateUserTest(String accessToken, UpdateUserTestRequest request);
-
-    UserResponse updateUsernameByRefreshTokenTest(UpdateUsernameByRefreshTokenTestRequest request);
-
-    List<UserResponse> getAllUsersTest(String authorization);
 }

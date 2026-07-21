@@ -12,11 +12,14 @@ public interface RefreshTokenService {
 
     IssuedRefreshToken issue(User user, String ip, String userAgent);
 
+    /** Lectura simple, sin lock — usada por logout para localizar la familia a revocar. */
     Optional<RefreshToken> resolve(String rawToken);
 
-    IssuedRefreshToken rotate(RefreshToken existing, String ip, String userAgent);
-
-    void revoke(RefreshToken token);
+    /**
+     * Resuelve + valida + rota el token en una única transacción con lock pesimista.
+     * Lanza RefreshTokenReuseException si el token ya estaba revocado (reuse).
+     */
+    IssuedRefreshToken rotate(String rawToken, String ip, String userAgent);
 
     void revokeFamily(UUID familyId);
 

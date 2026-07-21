@@ -10,24 +10,32 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_tokens")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "user")
 public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -61,6 +69,10 @@ public class RefreshToken {
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
+
+    /** Optimistic locking: defensa adicional contra escrituras concurrentes sobre el mismo token. */
+    @Version
+    private Long version;
 
     @PrePersist
     void onCreate() {

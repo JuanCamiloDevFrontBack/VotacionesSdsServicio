@@ -17,9 +17,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import com.example.votacionessds.exceptions.ErrorCode;
-import com.example.votacionessds.exceptions.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
@@ -39,53 +39,38 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(UserDetails userDetails) {
-        System.out.println("JwtProvider: generateAccessToken");
-        return generateAccessToken(userDetails, null);
-    }
+    /** Claims ya validados de un access token: username + sessionId (si presente). */
+    public record TokenClaims(String username, UUID sessionId) {}
 
     public String generateAccessToken(UserDetails userDetails, UUID sessionId) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + jwtExpiration);
-        var builder = Jwts.builder()
+        return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(now)
-                .expiration(exp);
-        if (sessionId != null) {
-            builder.claim(SESSION_CLAIM, sessionId.toString());
-        }
-        return builder.signWith(key).compact();
+                .expiration(exp)
+                .claim(SESSION_CLAIM, sessionId.toString())
+                // Algoritmo explícito: nunca dejarlo inferido del tamaño de la clave.
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
     }
 
-    public String getUsernameFromToken(String token) {
-        System.out.println("JwtProvider: getUsernameFromToken");
+    /**
+     * Parsea y valida el token UNA sola vez (firma + expiración). Reemplaza a
+     * validateToken()/getUsernameFromToken()/getSessionIdFromToken() por separado,
+     * que triplicaban la verificación criptográfica del mismo token por request.
+     */
+    public Optional<TokenClaims> parseValidClaims(String token) {
         try {
-            Claims claims = Jwts.parser()
-                .verifyWith(key).build().parseSignedClaims(token).getPayload();
-            return claims.getSubject();
-        } catch (ResourceNotFoundException ex) {
-            throw new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "User not found");
-        }
-    }
-
-    public Optional<UUID> getSessionIdFromToken(String token) {
-        System.out.println("JwtProvider: getSessionIdFromToken");
-        Claims claims = Jwts.parser()
-                .verifyWith(key).build().parseSignedClaims(token).getPayload();
-        Object sid = claims.get(SESSION_CLAIM);
-        if (sid == null) {
-            return Optional.empty();
-        }
-        return Optional.of(UUID.fromString(sid.toString()));
-    }
-
-    public boolean validateToken(String token) {
-        System.out.println("JwtProvider: validateToken");
-        try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
-            return true;
+            Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            String username = claims.getSubject();
+            Object sidClaim = claims.get(SESSION_CLAIM);
+            UUID sessionId = sidClaim != null ? UUID.fromString(sidClaim.toString()) : null;
+            return Optional.of(new TokenClaims(username, sessionId));
         } catch (JwtException | IllegalArgumentException ex) {
-            return false;
+            // No exponer el token ni la causa detallada al cliente; sí dejar rastro para auditoría.
+            log.debug("Token JWT rechazado: {}", ex.getClass().getSimpleName());
+            return Optional.empty();
         }
     }
 }

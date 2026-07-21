@@ -12,13 +12,16 @@ public final class RefreshTokenHasher {
     }
 
     public static String generateRawToken() {
-        System.out.println("RefreshTokenHasher: generateRawToken");
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * Hash determinístico (mismo input -> mismo output): necesario para poder
+     * buscar el token por igualdad exacta en BD (WHERE token_hash = ?).
+     * NUNCA loguear ni el rawToken ni el hash resultante — ver JwtAuthenticationFilter
+     * y RefreshTokenServiceImpl para el manejo correcto de logs de seguridad.
+     */
     public static String hash(String rawToken) {
-        System.out.println("RefreshTokenHasher: hash");
-        System.out.println("rawToken: " + rawToken);
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));

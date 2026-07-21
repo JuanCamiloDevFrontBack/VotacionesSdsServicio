@@ -26,12 +26,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionController {
 
-    private final UserSessionService userSessionService;
+    /*private final UserSessionService userSessionService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticatedUserProvider authenticatedUserProvider;
-    private final JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;*/
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<List<SessionResponse>> listSessions(
             @RequestHeader(value = "Authorization", required = false) final String authorization) {
         UUID userId = authenticatedUserProvider.getCurrentUserId();
@@ -63,5 +63,5 @@ public class SessionController {
             return Optional.empty();
         }
         return jwtProvider.getSessionIdFromToken(token);
-    }
+    }*/
 }

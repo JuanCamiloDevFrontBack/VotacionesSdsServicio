@@ -36,6 +36,12 @@ public class RefreshTokenCookieService {
         this.path = normalizeContextPath(contextPath) + "/api/auth";
     }
 
+    public ResponseCookie createCookie(String refreshToken) {
+        return baseCookie(refreshToken)
+                .maxAge(maxAge)
+                .build();
+    }
+
     public String getRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
@@ -43,23 +49,12 @@ public class RefreshTokenCookieService {
         }
 
         return Arrays.stream(cookies)
+                .peek(value -> System.out.println("Cookie: " + value)) // test
                 .filter(cookie -> cookieName.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .filter(StringUtils::hasText)
                 .findFirst()
                 .orElseThrow(this::missingRefreshToken);
-    }
-
-    public ResponseCookie createCookie(String refreshToken) {
-        return baseCookie(refreshToken)
-                .maxAge(maxAge)
-                .build();
-    }
-
-    public ResponseCookie clearCookie() {
-        return baseCookie("")
-                .maxAge(Duration.ZERO)
-                .build();
     }
 
     private ResponseCookie.ResponseCookieBuilder baseCookie(String value) {
@@ -68,6 +63,12 @@ public class RefreshTokenCookieService {
                 .secure(secure)
                 .sameSite(sameSite)
                 .path(path);
+    }
+
+    public ResponseCookie clearCookie() {
+        return baseCookie("")
+                .maxAge(Duration.ZERO)
+                .build();
     }
 
     private InvalidCredentialsException missingRefreshToken() {

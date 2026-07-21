@@ -13,8 +13,6 @@ import com.example.votacionessds.modules.auth.entity.UserSession;
 @Repository
 public interface UserSessionRepository extends JpaRepository<UserSession, UUID> {
 
-    Optional<UserSession> findByIdAndUserId(UUID id, UUID userId);
-
     List<UserSession> findByUserIdAndRevokedFalse(UUID userId);
 
     Optional<UserSession> findByFamilyId(UUID familyId);

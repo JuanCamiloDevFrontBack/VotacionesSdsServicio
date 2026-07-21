@@ -15,10 +15,13 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,14 +29,18 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"passwordHash", "roles"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -43,7 +50,6 @@ public class User {
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ToString.Exclude
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -83,10 +89,32 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    /**
+     * enabled/accountLocked son flags manuales (admin); lockedUntil es el
+     * bloqueo temporal automático por intentos fallidos. Ambos se evalúan aquí.
+     */
     public boolean isLoginAllowed() {
         return enabled
                 && !accountLocked
                 && (lockedUntil == null || lockedUntil.isBefore(Instant.now()));
+    }
+
+    /**
+     * Regla de negocio de lockout (OWASP: bloqueo temporal tras N intentos
+     * fallidos). Vive en la entidad para que no se pueda invocar el efecto
+     * secundario (bloquear la cuenta) sin pasar por esta única puerta.
+     */
+    public void registerFailedLoginAttempt(short maxAttempts, Duration lockDuration) {
+        this.failedLoginAttempts++;
+        if (this.failedLoginAttempts >= maxAttempts) {
+            this.lockedUntil = Instant.now().plus(lockDuration);
+            this.failedLoginAttempts = 0;
+        }
+    }
+
+    public void registerSuccessfulLogin() {
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
     }
 
     @PrePersist
