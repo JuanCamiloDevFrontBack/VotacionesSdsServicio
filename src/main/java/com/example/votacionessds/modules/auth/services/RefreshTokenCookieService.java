@@ -49,7 +49,6 @@ public class RefreshTokenCookieService {
         }
 
         return Arrays.stream(cookies)
-                .peek(value -> System.out.println("Cookie: " + value)) // test
                 .filter(cookie -> cookieName.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .filter(StringUtils::hasText)
