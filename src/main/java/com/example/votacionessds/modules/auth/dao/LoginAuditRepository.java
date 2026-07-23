@@ -1,16 +1,5 @@
 package com.example.votacionessds.modules.auth.dao;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-import com.example.votacionessds.modules.auth.entity.LoginAudit;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface LoginAuditRepository extends JpaRepository<LoginAudit, Long> {
-=======
-=======
->>>>>>> Stashed changes
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,8 +44,4 @@ public interface LoginAuditRepository extends JpaRepository<LoginAudit, Long> {
               )
             """, nativeQuery = true)
     int deleteOlderThanKeepByEmailWithoutUser(@Param("email") String email, @Param("keep") int keep);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
