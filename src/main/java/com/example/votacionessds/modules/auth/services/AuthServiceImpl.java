@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services.impl;
+package com.example.votacionessds.modules.auth.services;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -23,8 +23,6 @@ import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 import com.example.votacionessds.modules.auth.entity.RefreshToken;
 import com.example.votacionessds.modules.auth.entity.User;
 import com.example.votacionessds.modules.auth.entity.UserSession;
-import com.example.votacionessds.modules.auth.services.AuthService;
-import com.example.votacionessds.modules.auth.services.LoginAuditService;
 import com.example.votacionessds.security.CustomUserDetailsService;
 import com.example.votacionessds.security.JwtProvider;
 import com.example.votacionessds.security.RefreshTokenService;

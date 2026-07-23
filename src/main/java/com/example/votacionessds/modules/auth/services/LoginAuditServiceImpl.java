@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services.impl;
+package com.example.votacionessds.modules.auth.services;
 
 import java.util.UUID;
 
@@ -10,7 +10,6 @@ import com.example.votacionessds.modules.auth.dao.LoginAuditRepository;
 import com.example.votacionessds.modules.auth.dao.UserRepository;
 import com.example.votacionessds.modules.auth.entity.LoginAudit;
 import com.example.votacionessds.modules.auth.entity.User;
-import com.example.votacionessds.modules.auth.services.LoginAuditService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

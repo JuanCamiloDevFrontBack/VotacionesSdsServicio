@@ -21,6 +21,7 @@ import com.example.votacionessds.modules.auth.dao.LoginAuditRepository;
 import com.example.votacionessds.modules.auth.dao.UserRepository;
 import com.example.votacionessds.modules.auth.entity.LoginAudit;
 import com.example.votacionessds.modules.auth.entity.User;
+import com.example.votacionessds.modules.auth.services.LoginAuditServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class LoginAuditServiceImplRetentionTest {
