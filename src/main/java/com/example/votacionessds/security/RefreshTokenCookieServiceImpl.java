@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services;
+package com.example.votacionessds.security;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -15,7 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
-public class RefreshTokenCookieService {
+public class RefreshTokenCookieServiceImpl implements RefreshTokenCookieService {
 
     private final String cookieName;
     private final boolean secure;
@@ -23,7 +23,7 @@ public class RefreshTokenCookieService {
     private final Duration maxAge;
     private final String path;
 
-    public RefreshTokenCookieService(
+    public RefreshTokenCookieServiceImpl(
             @Value("${security.refresh-cookie.name:refresh_token}") String cookieName,
             @Value("${security.refresh-cookie.secure:true}") boolean secure,
             @Value("${security.refresh-cookie.same-site:None}") String sameSite,
@@ -36,12 +36,14 @@ public class RefreshTokenCookieService {
         this.path = normalizeContextPath(contextPath) + "/api/auth";
     }
 
+    @Override
     public ResponseCookie createCookie(String refreshToken) {
         return baseCookie(refreshToken)
                 .maxAge(maxAge)
                 .build();
     }
 
+    @Override
     public String getRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
@@ -64,6 +66,7 @@ public class RefreshTokenCookieService {
                 .path(path);
     }
 
+    @Override
     public ResponseCookie clearCookie() {
         return baseCookie("")
                 .maxAge(Duration.ZERO)

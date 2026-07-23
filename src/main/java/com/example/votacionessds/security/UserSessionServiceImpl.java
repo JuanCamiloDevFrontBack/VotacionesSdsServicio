@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services.impl;
+package com.example.votacionessds.security;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,7 +16,6 @@ import com.example.votacionessds.modules.auth.dao.RefreshTokenRepository;
 import com.example.votacionessds.modules.auth.dao.UserSessionRepository;
 import com.example.votacionessds.modules.auth.entity.User;
 import com.example.votacionessds.modules.auth.entity.UserSession;
-import com.example.votacionessds.modules.auth.services.UserSessionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

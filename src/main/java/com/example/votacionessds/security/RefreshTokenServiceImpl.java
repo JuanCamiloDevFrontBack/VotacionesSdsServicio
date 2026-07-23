@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services.impl;
+package com.example.votacionessds.security;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,8 +15,6 @@ import com.example.votacionessds.exceptions.RefreshTokenReuseException;
 import com.example.votacionessds.modules.auth.dao.RefreshTokenRepository;
 import com.example.votacionessds.modules.auth.entity.RefreshToken;
 import com.example.votacionessds.modules.auth.entity.User;
-import com.example.votacionessds.modules.auth.services.RefreshTokenService;
-import com.example.votacionessds.security.RefreshTokenHasher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenHasher refreshTokenHasher;
 
     @Value("${security.refresh-token.expiration-time:604800000}")
     private long refreshTokenExpirationMs;
@@ -40,7 +39,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional(readOnly = true)
     public Optional<RefreshToken> resolve(String rawToken) {
-        return refreshTokenRepository.findByTokenHash(RefreshTokenHasher.hash(rawToken));
+        return refreshTokenRepository.findByTokenHash(refreshTokenHasher.hash(rawToken));
     }
 
     @Override
@@ -50,7 +49,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         // carrera que antes permitía que dos requests concurrentes con el mismo
         // token pasaran ambas la validación de "revoked = false".
         RefreshToken existing = refreshTokenRepository
-                .findByTokenHashForUpdate(RefreshTokenHasher.hash(rawToken))
+                .findByTokenHashForUpdate(refreshTokenHasher.hash(rawToken))
                 .orElseThrow(() -> new InvalidCredentialsException(
                         ErrorCode.INVALID_REFRESH_TOKEN,
                         "Invalid refresh token"));
@@ -106,10 +105,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private IssuedRefreshToken persistToken(User user, UUID familyId, String ip, String userAgent) {
-        String rawToken = RefreshTokenHasher.generateRawToken();
+        String rawToken = refreshTokenHasher.generateRawToken();
         RefreshToken entity = RefreshToken.builder()
                 .user(user)
-                .tokenHash(RefreshTokenHasher.hash(rawToken))
+                .tokenHash(refreshTokenHasher.hash(rawToken))
                 .familyId(familyId)
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusMillis(refreshTokenExpirationMs))

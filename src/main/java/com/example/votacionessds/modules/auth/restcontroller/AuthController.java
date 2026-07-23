@@ -12,7 +12,7 @@ import com.example.votacionessds.modules.auth.dto.LoginRequest;
 import com.example.votacionessds.modules.auth.dto.LoginResponse;
 import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 import com.example.votacionessds.modules.auth.services.AuthService;
-import com.example.votacionessds.modules.auth.services.RefreshTokenCookieService;
+import com.example.votacionessds.security.RefreshTokenCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

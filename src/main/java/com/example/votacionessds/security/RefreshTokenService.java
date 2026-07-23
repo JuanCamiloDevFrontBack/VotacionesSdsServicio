@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services;
+package com.example.votacionessds.security;
 
 import com.example.votacionessds.modules.auth.entity.RefreshToken;
 import com.example.votacionessds.modules.auth.entity.User;

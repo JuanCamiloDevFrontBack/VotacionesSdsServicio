@@ -14,10 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.example.votacionessds.modules.auth.services.UserSessionService;
 import com.example.votacionessds.security.CustomUserDetailsService;
 import com.example.votacionessds.security.JwtAuthenticationFilter;
 import com.example.votacionessds.security.JwtProvider;
+import com.example.votacionessds.security.UserSessionService;
 
 import lombok.RequiredArgsConstructor;
 

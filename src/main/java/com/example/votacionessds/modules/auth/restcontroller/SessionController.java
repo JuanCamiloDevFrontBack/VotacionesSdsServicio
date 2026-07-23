@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.votacionessds.modules.auth.dto.SessionResponse;
-import com.example.votacionessds.modules.auth.services.RefreshTokenService;
-import com.example.votacionessds.modules.auth.services.UserSessionService;
 import com.example.votacionessds.security.AuthenticatedUserProvider;
 import com.example.votacionessds.security.JwtProvider;
+import com.example.votacionessds.security.RefreshTokenService;
+import com.example.votacionessds.security.UserSessionService;
 
 import lombok.RequiredArgsConstructor;
 

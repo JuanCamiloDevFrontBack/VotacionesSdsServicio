@@ -25,11 +25,11 @@ import com.example.votacionessds.modules.auth.entity.User;
 import com.example.votacionessds.modules.auth.entity.UserSession;
 import com.example.votacionessds.modules.auth.services.AuthService;
 import com.example.votacionessds.modules.auth.services.LoginAuditService;
-import com.example.votacionessds.modules.auth.services.RefreshTokenService;
-import com.example.votacionessds.modules.auth.services.RefreshTokenService.IssuedRefreshToken;
-import com.example.votacionessds.modules.auth.services.UserSessionService;
 import com.example.votacionessds.security.CustomUserDetailsService;
 import com.example.votacionessds.security.JwtProvider;
+import com.example.votacionessds.security.RefreshTokenService;
+import com.example.votacionessds.security.UserSessionService;
+import com.example.votacionessds.security.RefreshTokenService.IssuedRefreshToken;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

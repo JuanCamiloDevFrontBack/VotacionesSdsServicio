@@ -24,6 +24,7 @@ import com.example.votacionessds.modules.auth.dao.RefreshTokenRepository;
 import com.example.votacionessds.modules.auth.dao.UserSessionRepository;
 import com.example.votacionessds.modules.auth.entity.User;
 import com.example.votacionessds.modules.auth.entity.UserSession;
+import com.example.votacionessds.security.UserSessionServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class UserSessionServiceImplRetentionTest {

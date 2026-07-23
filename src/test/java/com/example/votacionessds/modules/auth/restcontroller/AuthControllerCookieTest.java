@@ -16,7 +16,8 @@ import com.example.votacionessds.modules.auth.dto.LoginRequest;
 import com.example.votacionessds.modules.auth.dto.LoginResponse;
 import com.example.votacionessds.modules.auth.dto.RefreshTokenResponse;
 import com.example.votacionessds.modules.auth.services.AuthService;
-import com.example.votacionessds.modules.auth.services.RefreshTokenCookieService;
+import com.example.votacionessds.security.RefreshTokenCookieService;
+import com.example.votacionessds.security.RefreshTokenCookieServiceImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.servlet.http.Cookie;
@@ -29,7 +30,7 @@ class AuthControllerCookieTest {
     @BeforeEach
     void setUp() {
         authService = mock(AuthService.class);
-        RefreshTokenCookieService cookieService = new RefreshTokenCookieService(
+        RefreshTokenCookieService cookieService = new RefreshTokenCookieServiceImpl(
                 "refresh_token",
                 true,
                 "None",

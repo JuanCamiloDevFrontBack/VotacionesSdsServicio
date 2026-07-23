@@ -1,4 +1,4 @@
-package com.example.votacionessds.modules.auth.services;
+package com.example.votacionessds.security;
 
 import java.time.Instant;
 import java.util.Optional;
