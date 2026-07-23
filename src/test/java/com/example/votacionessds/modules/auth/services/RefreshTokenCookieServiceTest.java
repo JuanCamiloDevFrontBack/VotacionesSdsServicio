@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.example.votacionessds.exceptions.InvalidCredentialsException;
-import com.example.votacionessds.security.RefreshTokenCookieService;
-import com.example.votacionessds.security.RefreshTokenCookieServiceImpl;
 
 import jakarta.servlet.http.Cookie;
 
