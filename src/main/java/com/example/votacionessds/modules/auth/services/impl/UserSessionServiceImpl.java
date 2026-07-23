@@ -5,12 +5,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+<<<<<<< Updated upstream
+=======
+import org.springframework.beans.factory.annotation.Value;
+>>>>>>> Stashed changes
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.votacionessds.exceptions.ErrorCode;
 import com.example.votacionessds.exceptions.InvalidCredentialsException;
+<<<<<<< Updated upstream
+=======
+import com.example.votacionessds.modules.auth.dao.RefreshTokenRepository;
+>>>>>>> Stashed changes
 import com.example.votacionessds.modules.auth.dao.UserSessionRepository;
 import com.example.votacionessds.modules.auth.entity.User;
 import com.example.votacionessds.modules.auth.entity.UserSession;
@@ -25,6 +33,13 @@ import lombok.extern.slf4j.Slf4j;
 public class UserSessionServiceImpl implements UserSessionService {
 
     private final UserSessionRepository userSessionRepository;
+<<<<<<< Updated upstream
+=======
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${security.retention.max-user-sessions:3}")
+    private int maxUserSessions;
+>>>>>>> Stashed changes
 
     @Override
     @Transactional
@@ -40,7 +55,13 @@ public class UserSessionServiceImpl implements UserSessionService {
                 .expiresAt(expiresAt)
                 .revoked(false)
                 .build();
+<<<<<<< Updated upstream
         return userSessionRepository.save(session);
+=======
+        UserSession saved = userSessionRepository.save(session);
+        pruneOlderSessions(user.getId());
+        return saved;
+>>>>>>> Stashed changes
     }
 
     @Override
@@ -113,6 +134,23 @@ public class UserSessionServiceImpl implements UserSessionService {
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    private void pruneOlderSessions(UUID userId) {
+        if (maxUserSessions <= 0) {
+            return;
+        }
+        List<UUID> excessFamilyIds = userSessionRepository.findFamilyIdsOlderThanKeep(userId, maxUserSessions);
+        if (!excessFamilyIds.isEmpty()) {
+            refreshTokenRepository.deleteByFamilyIdIn(excessFamilyIds);
+        }
+        int deleted = userSessionRepository.deleteOlderThanKeep(userId, maxUserSessions);
+        if (deleted > 0) {
+            log.info("Pruned older user sessions: userId={}, deleted={}", userId, deleted);
+        }
+    }
+
+>>>>>>> Stashed changes
     private boolean isSessionActive(UserSession session) {
         return !session.isRevoked() && !session.getExpiresAt().isBefore(Instant.now());
     }
