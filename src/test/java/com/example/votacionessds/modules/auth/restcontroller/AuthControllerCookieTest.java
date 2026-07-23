@@ -2,7 +2,10 @@ package com.example.votacionessds.modules.auth.restcontroller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 import static org.mockito.Mockito.mock;
@@ -16,7 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import org.springframework.security.access.AccessDeniedException;
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
@@ -81,8 +87,12 @@ class AuthControllerCookieTest {
                         .build());
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         ResponseEntity<RefreshTokenResponse> response =
                 controller.refreshToken("XMLHttpRequest", request);
+=======
+        ResponseEntity<RefreshTokenResponse> response = controller.refreshToken(request);
+>>>>>>> Stashed changes
 =======
         ResponseEntity<RefreshTokenResponse> response = controller.refreshToken(request);
 >>>>>>> Stashed changes
@@ -95,6 +105,7 @@ class AuthControllerCookieTest {
 
     @Test
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     void refresh_rejectsMissingCsrfHeader() {
         assertThatThrownBy(() -> controller.refreshToken(null, request()))
                 .isInstanceOf(AccessDeniedException.class);
@@ -103,12 +114,18 @@ class AuthControllerCookieTest {
     @Test
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     void logout_revokesTokenAndExpiresCookie() {
         MockHttpServletRequest request = request();
         request.setCookies(new Cookie("refresh_token", "refresh-token"));
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         ResponseEntity<Void> response = controller.logout("XMLHttpRequest", request);
+=======
+        ResponseEntity<Void> response = controller.logout(request);
+>>>>>>> Stashed changes
 =======
         ResponseEntity<Void> response = controller.logout(request);
 >>>>>>> Stashed changes

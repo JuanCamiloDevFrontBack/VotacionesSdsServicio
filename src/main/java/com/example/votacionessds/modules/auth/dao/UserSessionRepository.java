@@ -7,6 +7,12 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+>>>>>>> Stashed changes
 =======
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +33,10 @@ public interface UserSessionRepository extends JpaRepository<UserSession, UUID> 
 
     List<UserSession> findByRevokedFalseAndExpiresAtBefore(Instant expiresAt);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
     @Query(value = """
             SELECT family_id FROM user_sessions
@@ -57,5 +66,8 @@ public interface UserSessionRepository extends JpaRepository<UserSession, UUID> 
               )
             """, nativeQuery = true)
     int deleteOlderThanKeep(@Param("userId") UUID userId, @Param("keep") int keep);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
