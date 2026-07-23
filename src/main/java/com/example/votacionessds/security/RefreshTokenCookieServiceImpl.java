@@ -30,7 +30,7 @@ public class RefreshTokenCookieServiceImpl implements RefreshTokenCookieService 
             @Value("${security.refresh-cookie.secure:true}") boolean secure,
             @Value("${security.refresh-cookie.same-site:None}") String sameSite,
             @Value("${security.refresh-token.expiration-time:604800000}") long expirationTimeMs,
-            @Value("${server.servlet.context-path:}") String contextPath) {
+            @Value("${server.servlet.context-path}") String contextPath) {
         this.cookieName = cookieName;
         this.secure = secure;
         this.sameSite = sameSite;
