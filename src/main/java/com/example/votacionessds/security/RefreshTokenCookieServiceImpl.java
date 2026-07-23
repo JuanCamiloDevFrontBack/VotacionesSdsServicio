@@ -13,7 +13,9 @@ import com.example.votacionessds.exceptions.InvalidCredentialsException;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class RefreshTokenCookieServiceImpl implements RefreshTokenCookieService {
 

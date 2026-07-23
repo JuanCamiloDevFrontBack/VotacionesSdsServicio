@@ -10,7 +10,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class CorsConfig {
@@ -20,7 +22,7 @@ public class CorsConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("CorsConfig: corsConfigurationSource");
+        log.info("Initializing CORS configuration");
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOriginPatterns(allowedOrigins);
