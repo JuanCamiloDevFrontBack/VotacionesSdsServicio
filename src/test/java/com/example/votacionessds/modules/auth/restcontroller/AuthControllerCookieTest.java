@@ -1,7 +1,10 @@
 package com.example.votacionessds.modules.auth.restcontroller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+<<<<<<< Updated upstream
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+=======
+>>>>>>> Stashed changes
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,7 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+<<<<<<< Updated upstream
 import org.springframework.security.access.AccessDeniedException;
+=======
+>>>>>>> Stashed changes
 
 import com.example.votacionessds.modules.auth.dto.LoginRequest;
 import com.example.votacionessds.modules.auth.dto.LoginResponse;
@@ -74,8 +80,12 @@ class AuthControllerCookieTest {
                         .tokenType("Bearer")
                         .build());
 
+<<<<<<< Updated upstream
         ResponseEntity<RefreshTokenResponse> response =
                 controller.refreshToken("XMLHttpRequest", request);
+=======
+        ResponseEntity<RefreshTokenResponse> response = controller.refreshToken(request);
+>>>>>>> Stashed changes
 
         verify(authService).refreshToken("old-refresh-token", "127.0.0.1", "JUnit");
         assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE))
@@ -84,17 +94,24 @@ class AuthControllerCookieTest {
     }
 
     @Test
+<<<<<<< Updated upstream
     void refresh_rejectsMissingCsrfHeader() {
         assertThatThrownBy(() -> controller.refreshToken(null, request()))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
+=======
+>>>>>>> Stashed changes
     void logout_revokesTokenAndExpiresCookie() {
         MockHttpServletRequest request = request();
         request.setCookies(new Cookie("refresh_token", "refresh-token"));
 
+<<<<<<< Updated upstream
         ResponseEntity<Void> response = controller.logout("XMLHttpRequest", request);
+=======
+        ResponseEntity<Void> response = controller.logout(request);
+>>>>>>> Stashed changes
 
         verify(authService).logout("refresh-token");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
